@@ -1,53 +1,57 @@
+
 # Tripire DevOps Assessment
+
+> Infrastructure as Code, PostgreSQL automation, query optimization and CI validation using Terraform and GitHub Actions.
 
 ## Overview
 
-This repository contains my implementation of the Tripire DevOps assessment.
+This repository contains my implementation of the Tripire DevOps Assessment. The goal of this project was not only to provision infrastructure and complete the required database tasks, but also to organize the solution in a way that is maintainable, reusable, and close to real-world DevOps practices.
 
-The objective of this project was not only to provision infrastructure and create a working database, but also to demonstrate how I approach infrastructure design, maintainability, automation, and production-oriented engineering practices.
+The project includes:
 
-The solution includes:
-
-- Infrastructure as Code using Terraform
-- Modular infrastructure design
+- Modular Terraform infrastructure
 - Separate Development and Production environments
-- PostgreSQL database schema and seed data
-- Query optimization with indexing
-- Database backup and restore automation
-- GitHub Actions CI workflow for Terraform validation
+- PostgreSQL schema, seed data and query optimization
+- Backup and restore automation
+- GitHub Actions for Terraform validation
+- Docker Compose for local database development
 
 ---
 
-# Project Structure
+## Design Principles
 
-```
+While implementing this assessment, I followed a few simple principles:
+
+- Keep infrastructure modular instead of writing everything in one file.
+- Separate environments without duplicating code.
+- Automate repetitive tasks.
+- Keep local development reproducible.
+- Keep configuration readable and maintainable.
+- Document production improvements even when they are outside the assessment scope.
+
+---
+
+# Repository Structure
+
+```text
 tripire-devops-assessment
-│
 ├── .github/
 │   └── workflows/
-│       └── terraform.yml
-│
+├── database/
+│   ├── migrations/
+│   ├── queries/
+│   └── seeds/
 ├── infra/
 │   ├── environments/
 │   │   ├── dev/
 │   │   └── prod/
-│   │
 │   └── modules/
 │       ├── network/
 │       ├── security/
 │       ├── alb/
 │       ├── ecs/
 │       └── rds/
-│
-├── database/
-│   ├── migrations/
-│   ├── seeds/
-│   └── queries/
-│
 ├── scripts/
-│   ├── backup.sh
-│   └── restore.sh
-│
 ├── docker-compose.yml
 └── README.md
 ```
@@ -56,430 +60,299 @@ tripire-devops-assessment
 
 # Architecture
 
-```
-                Internet
-                    │
-              Application Load Balancer
-                    │
-             ECS Application Service
-                    │
-          Private PostgreSQL Database
-                    │
-               Automated Backups
+```text
+                 Internet
+                     │
+        ┌────────────────────────┐
+        │ Application LoadBalancer│
+        └────────────────────────┘
+                     │
+              ECS Application
+                     │
+        ┌────────────────────────┐
+        │   PostgreSQL Database  │
+        └────────────────────────┘
 ```
 
-The infrastructure is organized using reusable Terraform modules instead of a single monolithic configuration. This makes the code easier to maintain, reuse, and extend.
+## Why this architecture?
+
+Instead of placing all resources into a single Terraform configuration, the infrastructure is divided into reusable modules. This keeps the code easier to maintain, test, and extend while allowing the same modules to be reused by multiple environments.
 
 ---
 
-# Infrastructure
+# Terraform
 
-The infrastructure is divided into reusable modules.
+## Modules
 
-## Network Module
-
-Creates
-
+### Network
+Creates:
 - VPC
-- Public Subnets
-- Private Subnets
+- Public subnets
+- Private subnets
 - Internet Gateway
 - Route Tables
 
-Keeping networking isolated makes future expansion easier.
+**Why?**
 
----
+Networking usually changes less frequently than application resources. Keeping it isolated makes future changes easier without affecting the rest of the infrastructure.
 
-## Security Module
+### Security
 
-Creates dedicated security groups for
+Creates dedicated Security Groups for:
 
 - ALB
 - ECS
 - RDS
 
-This separates responsibilities and follows the principle of least privilege.
+This follows the principle of least privilege by allowing only the required communication between components.
 
----
+### ALB
 
-## ALB Module
-
-Creates
+Creates:
 
 - Application Load Balancer
 - Target Group
 - Listener
 
-The ALB module is isolated because it is commonly reused across multiple services.
+Separating load balancing from compute makes the module reusable for future services.
 
----
+### ECS
 
-## ECS Module
+Contains the application layer configuration.
 
-Creates
+Keeping compute resources separate from networking improves maintainability.
 
-- ECS Cluster
-- ECS Service
-- Task Definition
+### RDS
 
-The application layer remains independent from networking and database resources.
-
----
-
-## RDS Module
-
-Creates
+Creates:
 
 - PostgreSQL Instance
-- DB Subnet Group
-- Parameter configuration
+- Database subnet group
+- Supporting configuration
 
-Database configuration is isolated into its own module so future database upgrades can be managed independently.
+The database module remains independent so storage or instance changes can be performed without modifying networking resources.
 
 ---
 
 # Environment Separation
 
-Two environments are provided.
+Two independent environments are provided.
 
-```
+```text
 infra/environments/dev
 infra/environments/prod
 ```
 
-The environments share the same reusable modules while using different configuration values.
+Both environments reuse the same modules but use different configuration values.
 
-Development
+Development focuses on rapid testing.
 
-- Smaller instance
-- Lower storage
-- Short backup retention
-- Deletion protection disabled
-
-Production
-
-- Larger instance
-- Higher storage
-- Longer backup retention
-- Deletion protection enabled
-
-This approach minimizes code duplication while keeping environments independent.
-
----
-
-# Terraform Design Decisions
-
-## Modular Design
-
-Instead of placing all resources inside one Terraform file, the infrastructure is split into reusable modules.
-
-Benefits
-
-- Easier maintenance
-- Reusability
-- Cleaner code
-- Easier debugging
-- Production-friendly structure
-
----
-
-## Sensitive Variables
-
-Database passwords are not hardcoded.
-
-Terraform Sensitive Variables are used instead.
-
-```
-variable "db_password" {
-    type = string
-    sensitive = true
-}
-```
-
-The value is supplied through environment-specific `terraform.tfvars`.
-
-For this assessment I intentionally kept the solution simple.
-
-In a production environment I would typically use AWS Secrets Manager together with IAM roles instead of storing passwords in tfvars.
-
----
-
-## Backend
-
-The assessment uses a local backend.
-
-```
-terraform {}
-```
-
-For a production deployment I would migrate the Terraform state to:
-
-- Amazon S3
-- DynamoDB state locking
-
-to support team collaboration and state protection.
+Production uses safer defaults such as deletion protection and longer backup retention.
 
 ---
 
 # Database
 
-PostgreSQL is used as the relational database.
+The project uses PostgreSQL running locally through Docker Compose.
 
-Docker Compose is provided to simplify local development.
-
-```
+```bash
 docker compose up -d
 ```
 
----
+Using Docker allows anyone reviewing the project to start the database without installing PostgreSQL directly on the host system.
 
-# Database Schema
+## Database Schema
 
-The project contains two tables.
+The solution contains:
 
-## hotel_bookings
+- Hotel Bookings
+- Booking Events
 
-Stores booking information including
-
-- Booking ID
-- Organization ID
-- Hotel ID
-- City
-- Check-in
-- Check-out
-- Amount
-- Status
-
----
-
-## booking_events
-
-Stores booking lifecycle events.
-
-Each event references a booking using a foreign key.
-
-Example
-
-- Booking Created
-- Payment Completed
-- Booking Cancelled
-
-This separation follows a common event logging pattern.
+Booking events are stored separately from booking records to represent lifecycle events while maintaining a normalized schema.
 
 ---
 
 # Seed Data
 
-Two seed files are included.
+The repository includes SQL scripts to populate sample data for testing and query analysis.
 
-```
-001_seed_data.sql
-```
-
-Creates
-
-- 120 hotel bookings
-
-```
-002_seed_booking_events.sql
-```
-
-Creates
-
-- 80 booking events
-
-The generated data allows realistic testing and query optimization.
+This makes query optimization reproducible for anyone reviewing the assessment.
 
 ---
 
 # Query Optimization
 
-An index is created on
+Indexes are created to improve filtering performance.
 
-```
-(city, created_at, org_id, status)
-```
-
-The provided query demonstrates filtering by
-
-- City
-- Date Range
-
-while grouping by
-
-- Organization
-- Status
-
-`EXPLAIN ANALYZE` is included to verify query execution.
+`EXPLAIN ANALYZE` is used to verify execution plans and demonstrate the impact of indexing.
 
 ---
 
-# Backup and Restore
+# Backup & Restore
 
-Two automation scripts are provided.
+Two scripts are included.
 
 ## Backup
 
-```
+```bash
 ./scripts/backup.sh
 ```
 
-Creates a timestamped PostgreSQL backup.
-
-Example
-
-```
-backups/hoteldb_YYYYMMDD_HHMMSS.sql
-```
-
----
+Creates a timestamped database backup.
 
 ## Restore
 
-```
-./scripts/restore.sh backups/filename.sql
+```bash
+./scripts/restore.sh backups/<backup-file>.sql
 ```
 
-The restore script recreates the schema before restoring the dump to avoid duplicate object conflicts.
+The restore script recreates the schema before importing the backup to avoid duplicate object errors.
 
 ---
 
 # GitHub Actions
 
-GitHub Actions automatically performs Terraform validation.
+The repository includes a Terraform validation workflow.
 
-Workflow steps
+Pipeline:
 
 - Terraform Format Check
 - Terraform Init
 - Terraform Validate
 - Terraform Plan
 
-The workflow runs for both
+The workflow executes for both Development and Production environments.
 
-- Development
-- Production
+The purpose of the workflow is to detect formatting, syntax and planning issues before infrastructure changes are merged.
 
-This helps catch formatting and infrastructure issues before deployment.
+---
+
+# Security Considerations
+
+For the purpose of this assessment, placeholder values are used inside `terraform.tfvars`.
+
+In a production environment I would instead use:
+
+- AWS Secrets Manager
+- IAM Roles
+- GitHub Actions Secrets
+- Remote Terraform State (S3 + DynamoDB)
 
 ---
 
 # Assumptions
 
-To keep the implementation focused on the assessment, a few practical assumptions were made.
+To keep the implementation focused on the assessment:
 
 - Local Terraform backend
 - Dockerized PostgreSQL
 - Single AWS region
-- Single RDS instance
-- Basic production-ready networking
+- Single database instance
+- No application deployment
 
 ---
 
 # Future Improvements
 
-If this project were expanded into a production environment, I would add:
+If this project evolved into a production environment, I would add:
 
-- Remote Terraform backend using S3 + DynamoDB
+- Remote Terraform Backend (S3 + DynamoDB)
 - AWS Secrets Manager
-- Multi-AZ RDS deployment
+- Multi-AZ RDS
 - ECS Auto Scaling
-- CloudWatch monitoring
-- AWS WAF
 - Route53
-- ACM TLS certificates
-- VPC Flow Logs
-- Centralized logging
-- Terraform Workspaces
-- Terragrunt for multi-account management
-- Automated database migrations during deployment
-- Security scanning (Checkov, tfsec)
+- ACM Certificates
+- AWS WAF
+- CloudWatch Monitoring
+- Centralized Logging
+- Terraform Security Scanning (Checkov / tfsec)
 - Cost estimation using Infracost
 
 ---
 
-# How to Run
+# Running the Project
 
-Clone the repository
+## Start PostgreSQL
 
-```
-git clone <repository-url>
-```
-
-Start PostgreSQL
-
-```
+```bash
 docker compose up -d
 ```
 
-Run migrations
+## Run Migrations
 
-```
+```bash
 docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/migrations/001_create_tables.sql
 ```
 
-Run seed data
+## Seed Data
 
-```
+```bash
 docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/seeds/001_seed_data.sql
-
 docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/seeds/002_seed_booking_events.sql
 ```
 
-Create indexes
+## Create Indexes
 
-```
+```bash
 docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/queries/001_create_indexes.sql
 ```
 
-Run optimization query
+## Run Optimization Query
 
-```
+```bash
 docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/queries/002_query_optimization.sql
 ```
 
-Run backup
+## Backup
 
-```
+```bash
 ./scripts/backup.sh
 ```
 
-Restore backup
+## Restore
 
-```
+```bash
 ./scripts/restore.sh backups/<backup-file>.sql
 ```
 
-Terraform
+## Terraform
 
 Development
 
-```
+```bash
 cd infra/environments/dev
-
 terraform init
-
 terraform validate
-
 terraform plan
 ```
 
 Production
 
-```
+```bash
 cd infra/environments/prod
-
 terraform init
-
 terraform validate
-
 terraform plan
 ```
 
 ---
 
+# Verification
+
+The repository has been verified with:
+
+- Successful Terraform validation
+- Successful Terraform plan
+- Passing GitHub Actions workflow
+- Database migrations
+- Seed data
+- Backup and restore
+- Query optimization
+
+---
+
 # Final Notes
 
-While completing this assessment, I focused on writing infrastructure that is modular, readable, and easy to extend rather than optimizing only for the minimum working solution.
+The primary objective of this assessment was to demonstrate clean infrastructure organization, automation and maintainability rather than build a feature-complete production platform.
 
-Where appropriate, I intentionally kept the implementation simple for the scope of the assessment while documenting the production-grade improvements I would introduce in a real-world environment.
+Where appropriate, I intentionally kept the implementation simple while documenting the production-grade improvements I would introduce in a real-world environment.
