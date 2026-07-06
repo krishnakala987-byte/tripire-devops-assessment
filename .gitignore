@@ -4,4 +4,3 @@
 *.tfstate.*
 crash.log
 backups/*.sql
-infra/environments/*/terraform.tfvars
