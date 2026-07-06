@@ -1,0 +1,7 @@
+aws_region              = "ap-south-1"
+environment             = "dev"
+db_instance_class       = "db.t3.micro"
+db_allocated_storage    = 20
+backup_retention_period = 1
+deletion_protection     = false
+db_password             = "Tripire@2026DevOps!"
