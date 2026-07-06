@@ -48,7 +48,4 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan \
-          -var-file="terraform.tfvars" \
-          -refresh=false \
-          -lock=false
+        run: terraform plan -var-file=terraform.tfvars -refresh=false -lock=false
