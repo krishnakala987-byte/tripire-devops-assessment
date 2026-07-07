@@ -380,6 +380,22 @@ The repository has been verified with:
 
 ---
 
+# Screenshots
+
+**Terraform Plan Output**
+![Terraform Plan](docs/terraform-plan.png)
+
+**GitHub Actions — Passing Workflow**
+![GitHub Actions](docs/github-actions.png)
+
+**Database Tables**
+![Database Tables](docs/database-tables.png)
+
+**Query Optimization (EXPLAIN ANALYZE)**
+![Query Optimization](docs/query-optimization.png)
+
+---
+
 # Final Notes
 
 The primary objective of this assessment was to demonstrate clean infrastructure organization, automation and maintainability rather than build a feature-complete production platform.
