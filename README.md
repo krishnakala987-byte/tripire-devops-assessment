@@ -66,7 +66,7 @@ tripire-devops-assessment
                  Internet
                      │
         ┌────────────────────────┐
-        │ Application LoadBalancer│
+         Application Load Balancer│
         └────────────────────────┘
                      │
               ECS Application
