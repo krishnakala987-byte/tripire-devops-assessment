@@ -63,10 +63,10 @@ tripire-devops-assessment
 # Architecture
 
 ```text
-                 Internet
+                  Internet
                      │
         ┌────────────────────────┐
-         Application Load Balancer│
+        │Application Load Balancer│
         └────────────────────────┘
                      │
               ECS Application
