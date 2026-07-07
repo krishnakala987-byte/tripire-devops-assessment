@@ -167,10 +167,8 @@ Using Docker allows anyone reviewing the project to start the database without i
 
 The solution contains:
 
-<<<<<<< HEAD
 - Hotel Bookings
 - Booking Events
-=======
 ## Entity Relationship Diagram
 
 ```mermaid
@@ -198,7 +196,6 @@ erDiagram
 ```
 
 ## hotel_bookings
->>>>>>> 6784de9 (Add documentation screenshots and update README)
 
 Booking events are stored separately from booking records to represent lifecycle events while maintaining a normalized schema.
 
