@@ -167,8 +167,38 @@ Using Docker allows anyone reviewing the project to start the database without i
 
 The solution contains:
 
+<<<<<<< HEAD
 - Hotel Bookings
 - Booking Events
+=======
+## Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    HOTEL_BOOKINGS ||--o{ BOOKING_EVENTS : "has events"
+
+    HOTEL_BOOKINGS {
+        UUID booking_id PK
+        UUID org_id
+        UUID hotel_id
+        VARCHAR city
+        DATE check_in_date
+        DATE check_out_date
+        DECIMAL amount
+        VARCHAR status
+        TIMESTAMP created_at
+    }
+
+    BOOKING_EVENTS {
+        BIGINT id PK
+        UUID booking_id FK
+        VARCHAR event_type
+        TIMESTAMP created_at
+    }
+```
+
+## hotel_bookings
+>>>>>>> 6784de9 (Add documentation screenshots and update README)
 
 Booking events are stored separately from booking records to represent lifecycle events while maintaining a normalized schema.
 
