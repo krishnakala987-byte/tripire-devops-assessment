@@ -1,5 +1,5 @@
 
-# Tripire DevOps Assessment
+# Tripare DevOps Assessment
 
 ![Terraform Validation](https://github.com/krishnakala987-byte/tripire-devops-assessment/actions/workflows/terraform.yml/badge.svg)
 
