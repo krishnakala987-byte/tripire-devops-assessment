@@ -1,13 +1,13 @@
 
 # Tripare DevOps Assessment
 
-![Terraform Validation](https://github.com/krishnakala987-byte/tripire-devops-assessment/actions/workflows/terraform.yml/badge.svg)
+![Terraform Validation](https://github.com/krishnakala987-byte/tripare-devops-assessment/actions/workflows/terraform.yml/badge.svg)
 
 > Infrastructure as Code, PostgreSQL automation, query optimization and CI validation using Terraform and GitHub Actions.
 
 ## Overview
 
-This repository contains my implementation of the Tripire DevOps Assessment. The goal of this project was not only to provision infrastructure and complete the required database tasks, but also to organize the solution in a way that is maintainable, reusable, and close to real-world DevOps practices.
+This repository contains my implementation of the tripare DevOps Assessment. The goal of this project was not only to provision infrastructure and complete the required database tasks, but also to organize the solution in a way that is maintainable, reusable, and close to real-world DevOps practices.
 
 The project includes:
 
@@ -36,7 +36,7 @@ While implementing this assessment, I followed a few simple principles:
 # Repository Structure
 
 ```text
-tripire-devops-assessment
+tripare-devops-assessment
 ├── .github/
 │   └── workflows/
 ├── database/
@@ -310,26 +310,26 @@ docker compose up -d
 ## Run Migrations
 
 ```bash
-docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/migrations/001_create_tables.sql
+docker exec -i tripare-postgres psql -U postgres -d hoteldb < database/migrations/001_create_tables.sql
 ```
 
 ## Seed Data
 
 ```bash
-docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/seeds/001_seed_data.sql
-docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/seeds/002_seed_booking_events.sql
+docker exec -i tripare-postgres psql -U postgres -d hoteldb < database/seeds/001_seed_data.sql
+docker exec -i tripare-postgres psql -U postgres -d hoteldb < database/seeds/002_seed_booking_events.sql
 ```
 
 ## Create Indexes
 
 ```bash
-docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/queries/001_create_indexes.sql
+docker exec -i tripare-postgres psql -U postgres -d hoteldb < database/queries/001_create_indexes.sql
 ```
 
 ## Run Optimization Query
 
 ```bash
-docker exec -i tripire-postgres psql -U postgres -d hoteldb < database/queries/002_query_optimization.sql
+docker exec -i tripare-postgres psql -U postgres -d hoteldb < database/queries/002_query_optimization.sql
 ```
 
 ## Backup
